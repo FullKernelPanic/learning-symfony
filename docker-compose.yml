@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0.23
+    container_name: db
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_APP_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${DB_APP_DATABASE}
+      - MYSQL_USER=${DB_APP_USERNAME}
+      - MYSQL_PASSWORD=${DB_APP_PASSWORD}
+    ports:
+      - '8012:3306'
+  php:
+    container_name: php
+    restart: unless-stopped
+    build:
+      args:
+        user: developer
+        uid: 1000
+      context: .
+      dockerfile: ./.docker/php/Dockerfile
+    working_dir: /var/www
+    ports:
+      - '8010:80'
+    depends_on:
+      - db
+    environment:
+      docker: "true"
+    volumes:
+      - .:/var/www
+  webserver:
+    image: nginx:1.21.6
+    container_name: webserver
+    restart: unless-stopped
+    depends_on:
+      - php
+    ports:
+      - '8011:8000'
+    volumes:
+      - ./:/var/www
+      - ./.docker/nginx:/etc/nginx/conf.d
