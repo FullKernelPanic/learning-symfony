@@ -40,4 +40,4 @@ services:
       - '8011:8000'
     volumes:
       - ./:/var/www
-      - ./.docker/nginx:/etc/nginx/conf.d
+      - ./.docker/webserver:/etc/nginx/conf.d
